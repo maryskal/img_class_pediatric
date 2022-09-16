@@ -64,11 +64,10 @@ El segundo modelo utilizó como backbone el downsampling del primero, que había
 de la imagen, así se pretende no generar overfiting con las pocas imágenes que tenemos.
 
 Se aplicaron dos arquitecturas diferentes:
-1 - A la salida de este backbone se aplicó un método de atención (Channel Attention and Squeeze-and-Excitation Networks)
+- 1.  A la salida de este backbone se aplicó un método de atención (Channel Attention and Squeeze-and-Excitation Networks)
 para seleccionar los canales con mayor relevancia (output -> conv2D -> attention -> maxpool -> globalMaxPooling -> dense(128 chanels)). 
 También se extrajo el outcome de la capa 11 y 15 y se aplicó el mismo esquema, antes de concatenarla con diferentes capas densas.
-
-2 - Los tres outputs del backbone mencionados en la previa se concatenaron simplemente mediante GlobalMaxPooling, sin aplicar métodos
+- 2. Los tres outputs del backbone mencionados en la previa se concatenaron simplemente mediante GlobalMaxPooling, sin aplicar métodos
 de atención 
 
 ## Hiperparámetros
