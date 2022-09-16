@@ -51,8 +51,8 @@ Además a todas las imágenes se les aplicó (funciones_imagenes/prepare_img_fun
 
 
 # MODELOS
-Primero se construyó una U-Net que tenía como input lo mismo que como output, la idea era conseguir
-sintetizar toda la información de una Rx de tórax en el espacio de parámetros al fondo de la U-Net.
+Primero se construyó una U-Net que tenía como input lo mismo que como output (***entrenar_modelo_unsupervised.py***), 
+la idea era conseguir sintetizar toda la información de una Rx de tórax en el espacio de parámetros al fondo de la U-Net.
 Esta red se entrenó con todas las imágenes del NIH:
 
 - Con mascara o sin máscara
