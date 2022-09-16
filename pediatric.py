@@ -2,13 +2,19 @@ import argparse
 import os
 import otras_funciones.logs as logs
 import tensorflow as tf
+import numpy as np
+import cv2
 from sklearn.model_selection import train_test_split
-os.environ['CUDA_VISIBLE_DEVICES'] = str(0)
+os.environ['CUDA_VISIBLE_DEVICES'] = str(1)
 lr = 1e-4
 name = 'prueba_2'
 fzl = 18
-mask = True
+mask = False
 pixels = 512
+augment = True
+modelo = 'model_2'
+loss = 'binary_crossentropy'
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -29,8 +35,7 @@ if __name__ == '__main__':
                         help="learning rate")
     parser.add_argument('-m',
                         '--mask',
-                        type=bool,
-                        default=True,
+                        action = 'store_true',
                         help="apply mask")
     parser.add_argument('-fz',
                         '--frozen_layer',
@@ -45,17 +50,16 @@ if __name__ == '__main__':
     parser.add_argument('-lo',
                         '--loss',
                         type=str,
-                        default='basic',
+                        default='binary_crossentropy',
                         help="loss")
     parser.add_argument('-mo',
                         '--model',
-                        type=int,
-                        default=1,
+                        type=str,
+                        default='model_1',
                         help="model")
     parser.add_argument('-aug',
                         '--augment',
-                        type=bool,
-                        default=True,
+                        action = 'store_true',
                         help="augmentation")  
 
     args = parser.parse_args()
@@ -83,25 +87,24 @@ if __name__ == '__main__':
 
     # Agumentation
     if augment:
-        traingen = gen.DataGenerator_augment(train, 8, pixels, mask)
-        testgen = gen.DataGenerator_augment(test, 8, pixels, mask)
+        batch = int(batch/2)
+        traingen = gen.DataGenerator_augment(train, batch, pixels, mask)
+        testgen = gen.DataGenerator_augment(test, batch, pixels, mask)
     else:
-        traingen = gen.DataGenerator(train, 8, pixels, mask)
-        testgen = gen.DataGenerator(test, 8, pixels, mask)
+        traingen = gen.DataGenerator(train, batch, pixels, mask)
+        testgen = gen.DataGenerator(test, batch, pixels, mask)
 
     # MODELO ----------------------------------------------------
     # Model selection, pixels, mask and frozen layer
-    if modelo == 1:
+    if modelo == 'model_1':
         model = fine.modelo(pixels, fzl, mask)
     else:
         model = fine.modelo2(pixels, fzl, mask)
 
     # COMPILADO ----------------------------------------------------
     # Loss
-    if loss == 'loss1':
+    if loss == 'custom_loss':
         ls = losses.custom_binary_loss
-    elif loss == 'loss2':
-        ls = losses.custom_binary_loss_2
     else:
         ls = 'binary_crossentropy'
 
@@ -118,21 +121,43 @@ if __name__ == '__main__':
                         validation_data = testgen,
                         batch_size = batch,
                         callbacks = callb,
-                        epochs = epoch,
-                        shuffle = True)
+                        epochs = epoch)
+    
+    print('numero de errores: %i' % traingen.errors)
+    print('error location: {}'.format(traingen.errors_location))
 
-    # TRAIN AND SAVE MODEL ----------------------------------------------------
+    datos = [modelo, pixels, mask, augment, fzl, loss, lr, batch]
+
+    # EVALUACIÓN ----------------------------------------------------
+    # SAVE TRAINING
     import funciones_evaluacion.evaluation as ev
     # Guardar el train
-    name = ev.save_training(history, name, 
-            [name, fzl, '8', lr, mask, 0.8, pixels, None], '_unsupervised')
+    name = ev.save_training(name, 
+            datos, history)
     print('TRAINING GUARDADO')
 
-    # Guardar modelo
+    # SAVE MODEL
     model.save('/home/mr1142/Documents/Data/models/neumonia_pediatric/' + name + '.h5')
     print('MODELO GUARDADO')
 
-    # TEST - VALIDACION ----------------------------------------------------
+    # EVALUATION 
     results = model.evaluate(testgen, batch_size=batch)
-    ev.save_eval(name + '_val', results, subname = '_unsupervised')
+    p = '/home/mr1142/Documents/Data/models/neumonia_pediatric/validation_results/image_class_evaluation_pediatric.csv'
+    ev.save(name, datos, results, p)
     print('EVALUATE GUARDADO')
+
+    # PREDICTION
+    import funciones_evaluacion.metrics_and_plots as met
+    import funciones_imagenes.prepare_img_fun as fu
+
+    # Predecimos
+    y_real = np.array(test[['normal', 'viral', 'bacteria']])
+    y_pred = np.zeros((len(test), 3))
+    for i in range(len(test)):
+        img = cv2.imread(os.path.join(test['path'].iloc[i], test.img_name.iloc[i]))
+        y_pred[i,...] = model.predict(np.expand_dims(fu.get_prepared_img(img, pixels, mask, clahe_bool=True), 0))
+
+    # Calculo métricas y guardo
+    metricas, _ = met.metricas_dict(y_real, y_pred)
+    p = '/home/mr1142/Documents/Data/models/neumonia_pediatric/validation_results/prediction_validation_metrics.csv'
+    ev.save(name, datos, list(metricas.values()), p)

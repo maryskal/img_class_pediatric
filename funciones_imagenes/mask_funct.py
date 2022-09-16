@@ -9,7 +9,7 @@ def recolor_resize(img, pix=256):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     except:
         print('', end = '')
-    img = cv2.resize(img, (pix, pix))
+    img = cv2.resize(img.astype('float32'), (pix, pix))
     img = np.expand_dims(img, axis=-1)
     return img
 

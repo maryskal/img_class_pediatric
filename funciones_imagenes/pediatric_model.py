@@ -25,6 +25,7 @@ def create_dataframe(folder, path = '/home/mr1142/Documents/Data/chest_xray'):
 
     return df
 
+
 # MODELO ---------------------------------------------------------------
 
 def squeeze_and_excitation(inputs, ratio=16):

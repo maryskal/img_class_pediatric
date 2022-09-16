@@ -5,11 +5,11 @@ import numpy as np
 from mango import Tuner, scheduler
 
 
-param_space_ped = dict(modelo=['1', '2'],
+param_space_ped = dict(modelo=['model_1', 'model_2'],
                     frozen_layer = np.arange(0,18, 1),
                     lr= np.arange(1e-5, 1e-3, 1e-5),
                     pixels = [512, 256],
-                    loss = ['basic', 'loss1', 'loss2'],
+                    loss = ['binary_crossentropy', 'custom_loss'],
                     mask = [True, False],
                     augment = [True, False])
 
@@ -54,7 +54,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.device)
-    modelo = args.model 
 
     import otras_funciones.train_funct_ped as tr
     param_space = param_space_ped

@@ -19,7 +19,7 @@ def albumentation(input_image):
         ], p=0.8),
     ])
     transformed = transform(image=input_image.astype(np.float32))
-    input_image = fu.get_prepared_img(transformed['image'])
+    input_image = transformed['image']
     return input_image
 
 
@@ -30,6 +30,8 @@ class DataGenerator(Sequence):
         self.batch_size = batch_size
         self.pix = pix
         self.mask = mask
+        self.errors = 0
+        self.errors_location = []
 
     def __len__(self):
         # numero de batches
@@ -45,14 +47,17 @@ class DataGenerator(Sequence):
         batch_y = np.array(batch_df[['normal', 'viral', 'bacteria']])
         for i in range(len(batch_df)):
             try:
-                img = cv2.imread(os.path.join(batch_df['path'][i], batch_df.img_name[i]))
+                img = cv2.imread(os.path.join(batch_df['path'].iloc[i], batch_df.img_name.iloc[i]))
                 batch_x[i,...] = fu.get_prepared_img(img, self.pix, mask = self.mask, clahe_bool=True)
             except:
+                self.errors = self.errors +1
+                self.errors_location.append(idx*self.batch_size + i)
                 img = np.random.randint(0,255,self.pix*self.pix).reshape((self.pix, self.pix, 1))
                 batch_x[i,...] = msk.normalize(img)
-                print('e')
+                
         # batch_x = fu.augment_tensor(batch_x)
         return batch_x, batch_y
+
 
 
 class DataGenerator_augment(Sequence):
@@ -62,6 +67,8 @@ class DataGenerator_augment(Sequence):
         self.batch_size = batch_size
         self.pix = pix
         self.mask = mask
+        self.errors = 0
+        self.errors_location = []
 
     def __len__(self):
         # numero de batches
@@ -73,21 +80,37 @@ class DataGenerator_augment(Sequence):
         # batch 1: idx = 1 -> [1*batch_size:2*batch_size]
         # Lo que hago es recorrer el indice
         batch_df = self.df.iloc[idx * self.batch_size:(idx + 1) * self.batch_size].reset_index(drop = True)
+        # Cojo una muestra aleatoria del df
+        random_df = self.df.sample(self.batch_size)
+
+        # Creo dos arrays vacios
         batch_x = np.zeros((len(batch_df), self.pix, self.pix, 1))
-        batch_x_augment = np.zeros((len(batch_df), self.pix, self.pix, 1))
-        batch_y = np.array(batch_df[['normal', 'viral', 'bacteria']])
+        batch_x_augment = np.zeros((len(random_df), self.pix, self.pix, 1))
         for i in range(len(batch_df)):
             try:
-                img = cv2.imread(os.path.join(batch_df['path'][i], batch_df.img_name[i]))
-                batch_x[i,...] = fu.get_prepared_img(img, self.pix, mask = self.mask, clahe_bool=True)
-                batch_x_augment[i,...] = albumentation(img)
+                # Añado las imagenes del batch que toca
+                batch_x[i,...] = fu.get_prepared_img(cv2.imread(os.path.join(batch_df['path'].iloc[i], 
+                                                                            batch_df.img_name.iloc[i])),
+                                                     self.pix, mask = self.mask, clahe_bool=True)
+                # Añado las imagenes del batch aleatorio, aumentadas
+                batch_x_augment[i,...] = fu.get_prepared_img(albumentation(cv2.imread(os.path.join(random_df['path'].iloc[i], 
+                                                                                                random_df.img_name.iloc[i]))), 
+                                                            self.pix, mask = self.mask, clahe_bool=True) 
             except:
+                self.errors = self.errors +1
+                self.errors_location.append(idx*self.batch_size + i)
                 img = np.random.randint(0,255,self.pix*self.pix).reshape((self.pix, self.pix, 1))
                 batch_x[i,...] = msk.normalize(img)
-                batch_x_augment[i,...] = albumentation(img)
-                print('e')
+                batch_x_augment[i,...] = msk.normalize(img)
 
         batch_x = np.concatenate((batch_x, batch_x_augment), axis = 0)
-        batch_y = np.concatenate((batch_y, batch_y), axis = 0)
+        batch_y = np.concatenate((np.array(batch_df[['normal', 'viral', 'bacteria']]), 
+                                np.array(random_df[['normal', 'viral', 'bacteria']])), 
+                                axis = 0)
+
+        shuffler = np.random.permutation(len(batch_x))
+        batch_x = batch_x[shuffler]
+        batch_y = batch_y[shuffler]
+
         # batch_x = fu.augment_tensor(batch_x)
         return batch_x, batch_y

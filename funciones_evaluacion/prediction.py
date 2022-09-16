@@ -13,13 +13,6 @@ def img_predict(model, img, mask = False, pix = 512):
     return model.predict(img[np.newaxis,:])
 
 
-def prediction_tensor(model, X, index, mask = False, pix = 512):
-    y_pred = np.zeros((len(index), 3))
-    for i in range(y_pred.shape[0]):
-        y_pred[i,...] = img_predict(model, X[index[i]], mask, pix)
-    return y_pred
-
-
 def save_json(path, data):
     with open(os.path.join(path, 'metricas.json'), 'w') as j:
         json.dump(data, j)
