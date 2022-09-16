@@ -1,6 +1,5 @@
-**DATOS**
-
-***Dataset completo***
+# DATOS
+## Dataset completo
 El dataset completo es originario de: https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 
 Cuenta con las siguientes carpetas:
@@ -27,13 +26,14 @@ Cuenta con las siguientes carpetas:
 Se ha utilizado la carpeta train para entrenar y la test con la val se utilizarán para testear
 
 Los resultados del entrenamiento de estos modelos se han guardado en: 
-- /home/mr1142/Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
+- /Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
+
 Los resultados del test de los modelos entrenados de esta manera se guardaron en un dataframe:
-- /home/mr1142/Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
+- /Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
 
 
-**PREPROCESADO**
-En algunos casos se aplicó un modelo que enmascara el tórax antes de todo el preprocesado (funciones_imagenes/mask_function.py):
+# PREPROCESADO
+En algunos casos se aplicó un modelo que enmascara el tórax antes de todo el preprocesado (***funciones_imagenes/mask_function.py***):
 - Paso a escala de grises
 - Resize a 256,256
 - Aplicación del modelo y extracción de la máscara
@@ -50,7 +50,7 @@ Además a todas las imágenes se les aplicó (funciones_imagenes/prepare_img_fun
 - Normalización con z-score: (img - np.mean(img))/ np.std(img)
 
 
-**MODELOS**
+# MODELOS
 Primero se construyó una U-Net que tenía como input lo mismo que como output, la idea era conseguir
 sintetizar toda la información de una Rx de tórax en el espacio de parámetros al fondo de la U-Net.
 Esta red se entrenó con todas las imágenes del NIH:
@@ -66,10 +66,11 @@ Se aplicaron dos arquitecturas diferentes:
 1 - A la salida de este backbone se aplicó un método de atención (Channel Attention and Squeeze-and-Excitation Networks)
 para seleccionar los canales con mayor relevancia (output -> conv2D -> attention -> maxpool -> globalMaxPooling -> dense(128 chanels)). 
 También se extrajo el outcome de la capa 11 y 15 y se aplicó el mismo esquema, antes de concatenarla con diferentes capas densas.
+
 2 - Los tres outputs del backbone mencionados en la previa se concatenaron simplemente mediante GlobalMaxPooling, sin aplicar métodos
 de atención 
 
-***Hiperparámetros***
+## Hiperparámetros
 Los hiperparámetros que se han mantenido fijos han sido
 - batch size de 8
 - train - test proportion de 0.8-0.2
@@ -84,18 +85,17 @@ Los hiperparámetros que se han ido variando han sido
 - loss
 - augmentation
 
-***Modelos utilizados***
-Para entrenar con máscara se ha necesitado utilizar el modelo unet_final_renacimiento_validation_6.h5,
-que precisa de mask_1.h5 para ejecutarse, ya que cuenta con una loss que viene de ahí.
+## Modelos utilizados
+Para entrenar con máscara se ha necesitado utilizar el modelo unet_final_renacimiento_validation_6.h5.
 
 
-**ENTRENAMIENTOS**
-***Entrenamientos independientes***
+# ENTRENAMIENTOS
+## Entrenamientos independientes
 Se han hecho un par de entrenamientos independientes, con clahe no definido.
 
-***Hyperparameter tunning***
+## Hyperparameter tunning
 El resto de entrenamientos se han realizado con mango, algunos con clahe no definido y otros con clahe de 20.
 Los resultados se han guardado en:
-- /home/mr1142/Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
+- /Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
 Se ha testado con model.evaluate y los resultados se han guardado en:
-- /home/mr1142/Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
+- /Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
