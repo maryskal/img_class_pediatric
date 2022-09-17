@@ -63,7 +63,7 @@ Los modelos producto de estos entrenamientos se utilizaron como backbone para el
 El segundo modelo utilizó como backbone el downsampling del primero, que había simplificado la información
 de la imagen, así se pretende no generar overfiting con las pocas imágenes que tenemos.
 
-Se aplicaron dos arquitecturas diferentes:
+Se aplicaron dos arquitecturas diferentes (***funciones_imagenes/pediatric_model***):
 - 1.  A la salida de este backbone se aplicó un método de atención (Channel Attention and Squeeze-and-Excitation Networks)
 para seleccionar los canales con mayor relevancia (output -> conv2D -> attention -> maxpool -> globalMaxPooling -> dense(128 chanels)). 
 También se extrajo el outcome de la capa 11 y 15 y se aplicó el mismo esquema, antes de concatenarla con diferentes capas densas.
