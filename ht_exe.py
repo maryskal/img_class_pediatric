@@ -61,6 +61,10 @@ if __name__ == '__main__':
     tuner = Tuner(param_space, objective, conf_dict)
     results = tuner.maximize()
 
+    for k, v in results.items():
+            if type(v) is np.ndarray:
+                results[k] = list(v)
+
     print('best parameters:', results['best_params'])
     print('best f1score:', results['best_objective'])
 

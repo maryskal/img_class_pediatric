@@ -20,7 +20,6 @@ def dice_coef_loss(y_true, y_pred):
 
 
 def custom_binary_loss(y_true, y_pred): 
-    print(y_true)
     # https://github.com/tensorflow/tensorflow/blob/v2.3.1/tensorflow/python/keras/backend.py#L4826
     y_true = K.cast(y_true, 'float32')
     y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
@@ -31,7 +30,6 @@ def custom_binary_loss(y_true, y_pred):
 
 
 def custom_binary_loss_2(y_true, y_pred):
-    print(y_true)
     y_true = K.cast(y_true, 'float32')
     y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
     san = K.sum(1-y_true, axis = 0)
