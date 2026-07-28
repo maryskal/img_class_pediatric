@@ -76,5 +76,6 @@ It supports a Clinical Technology Consultant profile by showing how a clinical q
 
 ## License
 
-No license has been specified yet. Reuse is not granted unless a license is added.
+MIT License.
+
 
