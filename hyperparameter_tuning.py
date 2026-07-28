@@ -55,7 +55,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.device)
 
-    import otras_funciones.training as tr
+    import training_utils.training as tr
     param_space = param_space_ped
 
     tuner = Tuner(param_space, objective, conf_dict)
@@ -70,3 +70,4 @@ if __name__ == '__main__':
 
     with open('/home/mr1142/Documents/Data/models/neumonia/ht/results.json', 'w') as j:
         json.dump(results, j)
+

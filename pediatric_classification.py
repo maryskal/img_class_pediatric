@@ -1,6 +1,6 @@
 ﻿import argparse
 import os
-import otras_funciones.logs as logs
+import training_utils.logs as logs
 import tensorflow as tf
 import numpy as np
 import cv2
@@ -77,9 +77,9 @@ if __name__ == '__main__':
     epoch = 200
 
     #----------------------------------------------------
-    import funciones_imagenes.pediatric_model as fine
-    import funciones_imagenes.data_generator as gen
-    import funciones_imagenes.losses as losses
+    import image_processing.pediatric_model as fine
+    import image_processing.data_generator as gen
+    import image_processing.losses as losses
 
     # DATA ----------------------------------------------------
     df = fine.create_dataframe('train')
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     # EVALUACIÃ“N ----------------------------------------------------
     # SAVE TRAINING
-    import funciones_evaluacion.evaluation as ev
+    import evaluation.evaluation as ev
     # Guardar el train
     name = ev.save_training(name, 
             datos, history)
@@ -147,8 +147,8 @@ if __name__ == '__main__':
     print('EVALUATE GUARDADO')
 
     # PREDICTION
-    import funciones_evaluacion.metrics_plots as met
-    import funciones_imagenes.image_preprocessing as fu
+    import evaluation.metrics_plots as met
+    import image_processing.image_preprocessing as fu
 
     # Predecimos
     y_real = np.array(test[['normal', 'viral', 'bacteria']])
@@ -161,4 +161,5 @@ if __name__ == '__main__':
     metricas, _ = met.metricas_dict(y_real, y_pred)
     p = '/home/mr1142/Documents/Data/models/neumonia_pediatric/validation_results/prediction_validation_metrics.csv'
     ev.save(name, datos, list(metricas.values()), p)
+
 

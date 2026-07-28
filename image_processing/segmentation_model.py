@@ -1,6 +1,6 @@
-import os
+﻿import os
 import tensorflow.keras as keras
-import funciones_imagenes.losses as ex
+import image_processing.losses as ex
 
 
 model = os.path.join('./modelos', 'unet_final_renacimiento_validation_6.h5')

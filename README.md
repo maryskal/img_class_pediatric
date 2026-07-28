@@ -39,11 +39,11 @@ The raw images and trained model weights are not included in this repository. Sc
 ├── train_unsupervised_model.py
 ├── pediatric_classification.py
 ├── hyperparameter_tuning.py
-├── funciones_imagenes/
-├── funciones_evaluacion/
-├── funciones_unsupervised/
-├── otras_funciones/
-└── imagenes_modelos/
+├── image_processing/
+├── evaluation/
+├── unsupervised_learning/
+├── training_utils/
+└── model_figures/
 ```
 
 ## Methods
@@ -77,5 +77,6 @@ It supports a Clinical Technology Consultant profile by showing how a clinical q
 ## License
 
 MIT License.
+
 
 

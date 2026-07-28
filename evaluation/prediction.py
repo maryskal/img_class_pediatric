@@ -2,8 +2,8 @@
 import json
 import numpy as np
 import pandas as pd
-import funciones_imagenes.image_preprocessing as fu
-import funciones_evaluacion.metrics_plots as met
+import image_processing.image_preprocessing as fu
+import evaluation.metrics_plots as met
 
 def img_predict(model, img, mask = False, pix = 512):
     try:
@@ -54,5 +54,6 @@ def save_metricas(name, model, X, y, index, mask = False, subname = ''):
         met.save_plot(v, path, k)
     print('plots guardados')
     met.class_report(y_real, y_pred, path)
+
 
 

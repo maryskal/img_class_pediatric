@@ -3,8 +3,8 @@ import numpy as np
 import math
 import cv2
 import os
-import funciones_imagenes.image_preprocessing as fu
-import funciones_imagenes.mask_utils as msk
+import image_processing.image_preprocessing as fu
+import image_processing.mask_utils as msk
 import albumentations as A
 
 
@@ -114,4 +114,5 @@ class DataGenerator_augment(Sequence):
 
         # batch_x = fu.augment_tensor(batch_x)
         return batch_x, batch_y
+
 

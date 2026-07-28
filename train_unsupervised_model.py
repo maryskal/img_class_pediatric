@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 import numpy as np
-import funciones_modelos.logs as logs
+import training_utils.logs as logs
 import tensorflow as tf
 
 if __name__ == '__main__':
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     pixels = args.pixels
 
     #----------------------------------------------------
-    import funciones_unsupervised.unet_model as u_net
+    import unsupervised_learning.unet_model as u_net
 
     metrics = ['mean_squared_error', 'mean_absolute_error']
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     names_train = names[:round(len(names)*0.8)]
     names_test = names[round(len(names)*0.8):]
 
-    from funciones_unsupervised.data_generator import DataGenerator as gen
+    from unsupervised_learning.data_generator import DataGenerator as gen
 
     traingen = gen(names_train, batch, pixels, mask)
     testgen = gen(names_test, batch, pixels, mask)
@@ -82,4 +82,6 @@ if __name__ == '__main__':
 
     min = min(history.history['val_mean_squared_error'])
     unet_model.save('/home/mr1142/Documents/Data/models/' +  name + '_' + round(min[2:],4) + '.h5')
+
+
 

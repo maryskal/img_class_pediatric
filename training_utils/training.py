@@ -1,7 +1,7 @@
 ﻿import os
 import cv2
 import numpy as np
-import otras_funciones.logs as logs
+import training_utils.logs as logs
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
@@ -11,9 +11,9 @@ def train(modelo, frozen_layer, lr, pixels, loss, mask, augment):
     epoch = 200
     name = modelo + '_' + str(frozen_layer) + '_' + str(lr)[2:] + '_' + str(pixels) + '_' + loss + '_' + str(mask)[:1] + str(augment)[:1]
     #----------------------------------------------------
-    import funciones_imagenes.pediatric_model as fine
-    import funciones_imagenes.data_generator as gen
-    import funciones_imagenes.losses as losses
+    import image_processing.pediatric_model as fine
+    import image_processing.data_generator as gen
+    import image_processing.losses as losses
     
     # DATA ----------------------------------------------------
     df = fine.create_dataframe('train')
@@ -63,7 +63,7 @@ def train(modelo, frozen_layer, lr, pixels, loss, mask, augment):
     # EVALUACIÃ“N ----------------------------------------------------
     datos = [modelo, pixels, mask, augment, frozen_layer, loss, lr, batch]
     # SAVE TRAINING
-    import funciones_evaluacion.evaluation as ev
+    import evaluation.evaluation as ev
     # Guardar el train
     name = ev.save_training(name, 
             datos, history)
@@ -80,8 +80,8 @@ def train(modelo, frozen_layer, lr, pixels, loss, mask, augment):
     print('EVALUATE GUARDADO')
 
     # PREDICTION
-    import funciones_evaluacion.metrics_plots as met
-    import funciones_imagenes.image_preprocessing as fu
+    import evaluation.metrics_plots as met
+    import image_processing.image_preprocessing as fu
 
     # Predecimos
     y_real = np.array(test[['normal', 'viral', 'bacteria']])
@@ -97,3 +97,4 @@ def train(modelo, frozen_layer, lr, pixels, loss, mask, augment):
     metricas['auc_mean']= (metricas['auc_0']+metricas['auc_1']+metricas['auc_2'])/3
 
     return metricas['auc_mean']
+

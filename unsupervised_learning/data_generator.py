@@ -1,11 +1,11 @@
-from ctypes import sizeof
+﻿from ctypes import sizeof
 from tensorflow.keras.utils import Sequence
 import numpy as np
 import math
 import cv2
 import os
 import sys
-import funciones_imagenes.image_funct as fu
+import image_processing.image_funct as fu
 
 
 def charge_imgs(img_list):
@@ -57,4 +57,5 @@ class DataGenerator(Sequence):
         # batch_x = fu.augment_tensor(batch_x)
 
         return batch_x, batch_x
+
 
