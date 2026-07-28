@@ -1,10 +1,10 @@
-from tensorflow.keras.utils import Sequence
+﻿from tensorflow.keras.utils import Sequence
 import numpy as np
 import math
 import cv2
 import os
-import funciones_imagenes.prepare_img_fun as fu
-import funciones_imagenes.mask_funct as msk
+import funciones_imagenes.image_preprocessing as fu
+import funciones_imagenes.mask_utils as msk
 import albumentations as A
 
 
@@ -88,11 +88,11 @@ class DataGenerator_augment(Sequence):
         batch_x_augment = np.zeros((len(random_df), self.pix, self.pix, 1))
         for i in range(len(batch_df)):
             try:
-                # Añado las imagenes del batch que toca
+                # AÃ±ado las imagenes del batch que toca
                 batch_x[i,...] = fu.get_prepared_img(cv2.imread(os.path.join(batch_df['path'].iloc[i], 
                                                                             batch_df.img_name.iloc[i])),
                                                      self.pix, mask = self.mask, clahe_bool=True)
-                # Añado las imagenes del batch aleatorio, aumentadas
+                # AÃ±ado las imagenes del batch aleatorio, aumentadas
                 batch_x_augment[i,...] = fu.get_prepared_img(albumentation(cv2.imread(os.path.join(random_df['path'].iloc[i], 
                                                                                                 random_df.img_name.iloc[i]))), 
                                                             self.pix, mask = self.mask, clahe_bool=True) 
@@ -114,3 +114,4 @@ class DataGenerator_augment(Sequence):
 
         # batch_x = fu.augment_tensor(batch_x)
         return batch_x, batch_y
+

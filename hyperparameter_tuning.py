@@ -1,4 +1,4 @@
-import os
+﻿import os
 import argparse
 import json
 import numpy as np
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.device)
 
-    import otras_funciones.train_funct_ped as tr
+    import otras_funciones.training as tr
     param_space = param_space_ped
 
     tuner = Tuner(param_space, objective, conf_dict)

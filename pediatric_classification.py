@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import os
 import otras_funciones.logs as logs
 import tensorflow as tf
@@ -128,7 +128,7 @@ if __name__ == '__main__':
 
     datos = [modelo, pixels, mask, augment, fzl, loss, lr, batch]
 
-    # EVALUACIÓN ----------------------------------------------------
+    # EVALUACIÃ“N ----------------------------------------------------
     # SAVE TRAINING
     import funciones_evaluacion.evaluation as ev
     # Guardar el train
@@ -147,8 +147,8 @@ if __name__ == '__main__':
     print('EVALUATE GUARDADO')
 
     # PREDICTION
-    import funciones_evaluacion.metrics_and_plots as met
-    import funciones_imagenes.prepare_img_fun as fu
+    import funciones_evaluacion.metrics_plots as met
+    import funciones_imagenes.image_preprocessing as fu
 
     # Predecimos
     y_real = np.array(test[['normal', 'viral', 'bacteria']])
@@ -157,7 +157,8 @@ if __name__ == '__main__':
         img = cv2.imread(os.path.join(test['path'].iloc[i], test.img_name.iloc[i]))
         y_pred[i,...] = model.predict(np.expand_dims(fu.get_prepared_img(img, pixels, mask, clahe_bool=True), 0))
 
-    # Calculo métricas y guardo
+    # Calculo mÃ©tricas y guardo
     metricas, _ = met.metricas_dict(y_real, y_pred)
     p = '/home/mr1142/Documents/Data/models/neumonia_pediatric/validation_results/prediction_validation_metrics.csv'
     ev.save(name, datos, list(metricas.values()), p)
+

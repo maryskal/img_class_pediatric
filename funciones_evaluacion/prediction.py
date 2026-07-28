@@ -1,9 +1,9 @@
-import os
+﻿import os
 import json
 import numpy as np
 import pandas as pd
-import funciones_imagenes.prepare_img_fun as fu
-import funciones_evaluacion.metrics_and_plots as met
+import funciones_imagenes.image_preprocessing as fu
+import funciones_evaluacion.metrics_plots as met
 
 def img_predict(model, img, mask = False, pix = 512):
     try:
@@ -22,7 +22,7 @@ def save_in_csv(path, name, metricas, subname):
     df = pd.read_csv(os.path.join(path, 'prediction_validation_metrics' + subname + '.csv'))
     save = [name] + list(metricas.values())
     try:
-        # Si ya existe el modelo, se sobreescriben las métricas
+        # Si ya existe el modelo, se sobreescriben las mÃ©tricas
         i = df[df['name'] == name].index
         df.loc[i[0]] = save
     except:
@@ -54,4 +54,5 @@ def save_metricas(name, model, X, y, index, mask = False, subname = ''):
         met.save_plot(v, path, k)
     print('plots guardados')
     met.class_report(y_real, y_pred, path)
+
 
