@@ -1,101 +1,79 @@
-# DATOS
-## Dataset completo
-El dataset completo es originario de: https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
+﻿# Pediatric Chest X-Ray AI Prototype
 
-Cuenta con las siguientes carpetas:
-- train
-    - normal: 1341 images
-    - pneumonia: 3875 images
-- test
-    - normal: 234
-    - pneumonia: 390
-- val
-    - normal: 8
-    - pneumonia: 8
-- chest_xray
-    - train
-        - normal: 1342
-        - pneumonia: 1876
-    - test
-        - normal: 234
-        - pneumonia: 390
-    - val
-        - normal: 9
-        - pneumonia: 9
+Prototype code for pediatric chest X-ray image classification experiments, focused on pneumonia versus normal image categories and on the technical challenges of working with limited pediatric imaging data.
 
-Se ha utilizado la carpeta train para entrenar y la test con la val se utilizarán para testear
+This repository is kept as a portfolio example of clinical-technical translation in medical imaging AI: converting a pediatric imaging question into preprocessing, model design, hyperparameter exploration and evaluation code.
 
-Los resultados del entrenamiento de estos modelos se han guardado en: 
-- /Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
+## Clinical-Technical Focus
 
-Los resultados del test de los modelos entrenados de esta manera se guardaron en un dataframe:
-- /Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
+Pediatric AI work often raises questions that are not visible from model code alone:
 
+- Can models trained or pre-trained on broader imaging data be adapted to pediatric tasks?
+- How should preprocessing and thoracic masking affect model inputs?
+- How can limited pediatric sample size increase overfitting risk?
+- Which outputs are exploratory metrics rather than clinically validated evidence?
 
-# PREPROCESADO
-En algunos casos se aplicó un modelo que enmascara el tórax antes de todo el preprocesado (***funciones_imagenes/mask_function.py***):
-- Paso a escala de grises
-- Resize a 256,256
-- Aplicación del modelo y extracción de la máscara
-- Resize de la máscara al tamaño de la imagen original
-- Quitar agujeros y labels extra a la mascara
-- Aplicar la máscara sobre la imagen original
-- Desnormalizar el resultado
+This repository shows the technical side of that workflow while keeping the clinical limitations explicit.
 
-Además a todas las imágenes se les aplicó (funciones_imagenes/prepare_img_fun.py):
-- Paso a escala de grises: cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) -> (pix,pix)
-- Resize: img = cv2.resize(img, (512,512)) -> (512,512)
-- Expandir dimension: img = np.expand_dims(img, axis=-1)
-- Clahe: con clip limit sin especificar o de 2
-- Normalización con z-score: (img - np.mean(img))/ np.std(img)
+## Dataset
 
+The original public dataset referenced by the project is:
 
-# MODELOS
-Primero se construyó una U-Net que tenía como input lo mismo que como output (***entrenar_modelo_unsupervised.py***), 
-la idea era conseguir sintetizar toda la información de una Rx de tórax en el espacio de parámetros al fondo de la U-Net.
-Esta red se entrenó con todas las imágenes del NIH:
+- Chest X-Ray Images (Pneumonia), Kaggle: https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 
-- Con mascara o sin máscara
-- Con 512 o 256 pixels
+The raw images and trained model weights are not included in this repository. Scripts expect data and model artifacts to be available locally.
 
-Los modelos producto de estos entrenamientos se utilizaron como backbone para el siguiente modelo.
+## What Is Included
 
-El segundo modelo utilizó como backbone el downsampling del primero, que había simplificado la información
-de la imagen, así se pretende no generar overfiting con las pocas imágenes que tenemos.
+- Image preprocessing utilities.
+- Optional thoracic masking workflow.
+- U-Net based representation learning experiments.
+- Pediatric classification model code.
+- Evaluation and plotting utilities.
+- Hyperparameter exploration scripts.
 
-Se aplicaron dos arquitecturas diferentes (***funciones_imagenes/pediatric_model***):
-- 1.  A la salida de este backbone se aplicó un método de atención (Channel Attention and Squeeze-and-Excitation Networks)
-para seleccionar los canales con mayor relevancia (output -> conv2D -> attention -> maxpool -> globalMaxPooling -> dense(128 chanels)). 
-También se extrajo el outcome de la capa 11 y 15 y se aplicó el mismo esquema, antes de concatenarla con diferentes capas densas.
-- 2. Los tres outputs del backbone mencionados en la previa se concatenaron simplemente mediante GlobalMaxPooling, sin aplicar métodos
-de atención 
+## Repository Structure
 
-## Hiperparámetros
-Los hiperparámetros que se han mantenido fijos han sido
-- batch size de 8
-- train - test proportion de 0.8-0.2
-- Optimizador Adam
+```text
+.
+├── entrenar_modelo_unsupervised.py
+├── pediatric.py
+├── ht_exe.py
+├── funciones_imagenes/
+├── funciones_evaluacion/
+├── funciones_unsupervised/
+├── otras_funciones/
+└── imagenes_modelos/
+```
 
-Los hiperparámetros que se han ido variando han sido
-- pixels (que a su vez modificaban el backbone)
-- modelo (1 o 2)
-- mascara (que a su vez modificaba el backbone)
-- frozen layer
-- learning rate
-- loss
-- augmentation
+## Methods
 
-## Modelos utilizados
-Para entrenar con máscara se ha necesitado utilizar el modelo unet_final_renacimiento_validation_6.h5.
+The workflow includes:
 
+- Grayscale conversion, resizing and z-score normalization.
+- Optional CLAHE contrast enhancement.
+- Optional mask-based preprocessing to focus on thoracic regions.
+- U-Net based representation learning.
+- Pediatric classification architectures with attention-style components.
+- Evaluation using model outputs and custom metric utilities.
 
-# ENTRENAMIENTOS
-## Entrenamientos independientes
-Se han hecho un par de entrenamientos independientes, con clahe no definido.
+## Limitations
 
-## Hyperparameter tunning
-El resto de entrenamientos se han realizado con mango, algunos con clahe no definido y otros con clahe de 20.
-Los resultados se han guardado en:
-- /Documents/Data/models/neumonia/training_data/train_max_unsupervised.csv
-Se ha testado con model.evaluate y los resultados se han guardado en:
-- /Documents/Data/models/neumonia/validation_results/image_class_evaluation_unsupervised.csv
+This is an exploratory research prototype. It has not been clinically validated and is not intended for diagnosis, triage, treatment decisions or patient care.
+
+Important limitations:
+
+- Raw image data and trained weights are not included.
+- Some scripts expect local paths or previously generated artifacts.
+- Results should not be interpreted as clinical performance claims.
+- A clinically meaningful evaluation would require external validation, bias analysis, calibration, workflow assessment and prospective clinical study design.
+
+## Portfolio Context
+
+This repository is most relevant as evidence of medical imaging AI literacy, pediatric validation thinking, preprocessing choices and clinical caution around limited datasets.
+
+It supports a Clinical Technology Consultant profile by showing how a clinical question can be translated into data preparation, model experimentation and validation-aware documentation.
+
+## License
+
+No license has been specified yet. Reuse is not granted unless a license is added.

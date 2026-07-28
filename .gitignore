@@ -1,1 +1,14 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local data and model artifacts
 *.h5
+*.hdf5
+models/
+outputs/
+results/*.h5
